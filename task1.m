@@ -32,12 +32,11 @@ c_bona = bonacich(G);
 c_close = closeness(G);
 
 delta = [0.25 0.5 0.75];
-c_decay = zeros(n,length(delta));
-for d=1:length(delta)
-    c_decay(:,d) = decay(G,delta(d));
+c_decay = zeros(n,0);
+for d=delta
+    c_decay(:,end+1) = decay(G,d);
 end
 
-%% c_betw = centrality(G,'betweenness');
 c_betw = betweenness(G);
 
 %% Prints
@@ -49,6 +48,7 @@ dataTable = table(cities(enum)',c_bona(enum),c_close(enum),c_decay(enum,1),c_dec
     'VariableNames',{'City','Bonacich','Closeness','Decay (0.25)','Decay (0.5)','Decay (0.75)','Betweenness'});
 disp(dataTable)
 
+%% Graph construction functions
 function W = connect(W,a,b)
     W(a,b) = 1;
     W(b,a) = 1;
