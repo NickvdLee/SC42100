@@ -41,49 +41,45 @@ end
 c_betw = zeros(n,1);
 V = G.Nodes;
 for s=1:numnodes(G) % Represent node as numeric
-    S = []; % Empty stack
-    P = cell(numnodes(G),1); % Empty list?
+    S = Stack; 
+    P = []; % Empty List
     sigma = zeros(numnodes(G),1);
     sigma(s) = 1;
     d = -ones(numnodes(G),1);
     d(s) = 0;
-    Q = [s]; % Queue
+    Q = Queue;
+    Q.enqueue(s);
     while ~isempty(Q)
-        v = Q(1); Q = Q(2:end);
-        S = [S v];
-        
+        v = Q.dequeue;
+        S.push(v);
         N = neighbors(G,v);
-        for k=1:length(N)
-            w = N(k);
-            % w found for the first time?
+        for i=1:length(N)
+            w = N(i);
             if d(w) < 0
-                Q = [Q w];
-                d(w) = d(v) + 1;
+                Q.enqueue(w)
+                d(w) = d(v)+1;
             end
-            % shortest path to w via v?
-            if d(w) == d(v) + 1
-                sigma(w) = sigma(w) + sigma(v);
-                if isempty(P{w})
-                    P{w} = [v];
-                else
-                    P{w} = [P{w} v];
-                end
-            end
+            if d(w) == d(v)+1
+                sigma(w) = sigma(w)+sigma(v);
+                P = [P v];
+             end
         end
     end
+    P = unique(P);
     
     delta = zeros(numnodes(G),1);
     while ~isempty(S)
-        w = S(1); S = S(2:end);
-        for k=1:length(P{w})
-            delta(v) = delta(v) + sigma(v)/sigma(w)*(1+delta(w));
-        end
-        if w ~= s
-            c_betw(w) = c_betw(w)+delta(w);
+        w = S.pop;
+        for i=1:length(P)
+            v = P(i);
+            delta(v) = delta(v)+sigma(v)/sigma(w)*(1+delta(w));
+            if w~=s
+                c_betw(w) = c_betw(w)+delta(w);
+            end
         end
     end
-    
 end
+
 
 %% Prints
 enum = [findnode(G,'Amsterdam'),...
