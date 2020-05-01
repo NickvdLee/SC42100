@@ -38,48 +38,7 @@ for d=1:length(delta)
 end
 
 %% c_betw = centrality(G,'betweenness');
-c_betw = zeros(n,1);
-V = G.Nodes;
-for s=1:numnodes(G) % Represent node as numeric
-    S = Stack; 
-    P = []; % Empty List
-    sigma = zeros(numnodes(G),1);
-    sigma(s) = 1;
-    d = -ones(numnodes(G),1);
-    d(s) = 0;
-    Q = Queue;
-    Q.enqueue(s);
-    while ~isempty(Q)
-        v = Q.dequeue;
-        S.push(v);
-        N = neighbors(G,v);
-        for i=1:length(N)
-            w = N(i);
-            if d(w) < 0
-                Q.enqueue(w)
-                d(w) = d(v)+1;
-            end
-            if d(w) == d(v)+1
-                sigma(w) = sigma(w)+sigma(v);
-                P = [P v];
-             end
-        end
-    end
-    P = unique(P);
-    
-    delta = zeros(numnodes(G),1);
-    while ~isempty(S)
-        w = S.pop;
-        for i=1:length(P)
-            v = P(i);
-            delta(v) = delta(v)+sigma(v)/sigma(w)*(1+delta(w));
-            if w~=s
-                c_betw(w) = c_betw(w)+delta(w);
-            end
-        end
-    end
-end
-
+c_betw = betweenness(G);
 
 %% Prints
 enum = [findnode(G,'Amsterdam'),...
