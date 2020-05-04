@@ -1,4 +1,7 @@
 function [decays] = decay(G,delta)
+% IN: GRAPH x SCALAR
+% OUT: SCALAR R^numnodes(G)
+
 n = length(G.Nodes.Name);
 dist = distances(G);
 decays = zeros(n,1);

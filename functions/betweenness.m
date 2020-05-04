@@ -1,4 +1,6 @@
 function bc = betweenness( G )
+% IN: GRAPH
+% OUT: SCALAR R^numnodes(G)
 
 bc = zeros(numnodes(G),1);
 n = numnodes(G);
@@ -37,4 +39,4 @@ for s=1:n
         end
     end
 end
-bc = bc./(n^2);
+bc = bc./(2*n^2);
