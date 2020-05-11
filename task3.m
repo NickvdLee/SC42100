@@ -16,7 +16,7 @@ beta = 0.15; % Typical value
 PageRank = mu; % Typical i  nitialization?
 M = (1-beta)*P'; % Cache these
 num_plots = beta*mu;
-for i=1:10
+for i=1:50
     PageRank = M*PageRank + num_plots;
 end
 % Pagerank = (eye(l)-M)\N; SS solution
@@ -27,15 +27,8 @@ end
 % Let's find out if there already are stubborn nodes (sinks)
 sources = [];
 sinks = [];
-in = indegree(G);
-out = outdegree(G);
-for k=1:numnodes(G)
-    if in(k) == 0
-        sources = [sources;k];
-    elseif out(k) == 0
-        sinks = [sinks;k];
-    end
-end
+in = find(indegree(G) == 0);
+out = find(outdegree(G) == 0);
 
 % 1 is already a sink, and the pagerank idxs were
 % 2 1 112 9 26 so lets also chose one of them
