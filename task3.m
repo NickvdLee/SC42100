@@ -119,6 +119,8 @@ for S=C
     % Dynamics
     T = 150;
     y = rand(r,1);
+    y(1) = 0.5;
+    
     for t=1:T-1
         y = Q*y + B*u;
     end
