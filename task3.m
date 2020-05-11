@@ -98,6 +98,7 @@ Y = [];
 % strongstrong strongweak weakstrong weakweak
 C = [[1;112] [2;randi(l,1,1)] [randi(l,1,1);26] sort(randi(l,2,1))];
 for S=C
+    G = digraph(W);
     s = 2;
     R = 1:l;
     R(S) = [];
