@@ -98,6 +98,7 @@ Y = [];
 % strongstrong strongweak weakstrong weakweak
 C = [[1;112] [2;randi(l,1,1)] [randi(l,1,1);26] sort(randi(l,2,1))];
 for S=C
+    G = digraph(W);
     s = 2;
     R = 1:l;
     R(S) = [];
@@ -118,6 +119,8 @@ for S=C
     % Dynamics
     T = 150;
     y = rand(r,1);
+    y(1) = 0.5;
+    
     for t=1:T-1
         y = Q*y + B*u;
     end
