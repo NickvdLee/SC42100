@@ -96,7 +96,7 @@ ylabel('Opinion')
 Y = [];
 % Node strength:
 % strongstrong strongweak weakstrong weakweak
-C = [[112;1] [2;randi(l,1,1)] [randi(l,1,1);26] sort(randi(l,2,1))];
+C = [[1;112] [2;randi(l,1,1)] [randi(l,1,1);26] sort(randi(l,2,1))];
 for S=C
     s = 2;
     R = 1:l;
