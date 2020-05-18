@@ -27,7 +27,7 @@ G = digraph(Links(:,1), Links(:,2), Links(:,3));
 % matlab will treat the weight as the capacity of the edge. Therefore the
 % weight vector needs to be swapped out for the capacity vector. 
 
-G.Edges.weight = capacities;
+G.Edges.Weight = capacities;
 [mf1_13,~] = maxflow(G,1,13);
 
 %% 5.c
