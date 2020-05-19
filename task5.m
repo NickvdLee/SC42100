@@ -1,6 +1,7 @@
 close all; clear all; clc;
 addpath('functions/');
 addpath('cvx/');
+cvx_startup
 load -ascii traffic.mat 
 load -ascii traveltime.mat
 load -ascii capacities.mat
