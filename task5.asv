@@ -65,15 +65,4 @@ cvx_end
 fo = f;
 
 %% 5.f
-dacc = c.*l./((c-fstar).*(c-fstar));
-w = fstar.*dacc;
-
-cvx_begin
-    variable f(M)
-    minimize sum(-l.*c.*log(c-f)/log(exp(1))+w.*f)
-    subject to
-        B*f == lambda - mu
-        0 <= f <= c
-cvx_end
-fo2 = f;
-
+dacc = 
