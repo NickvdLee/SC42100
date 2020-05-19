@@ -20,7 +20,7 @@ end
 Links(:,3) = traveltime;
 
 % Make graph using empty network weights
-G = digraph(Links(:,1), Links(:,2), Links(:,3));
+G = digraph(Links(:,1)', Links(:,2)', Links(:,3)');
 
 %% 5.a
 [p1_13, d1_13, e1_13]  = shortestpath(G,1,13);
@@ -29,7 +29,8 @@ G = digraph(Links(:,1), Links(:,2), Links(:,3));
 % matlab will treat the weight as the capacity of the edge. Therefore the
 % weight vector needs to be swapped out for the capacity vector. 
 
-G.Edges.Weight = capacities;
+Links(:,3) = capacities;
+G = digraph(Links(:,1)',Links(:,2), Links(:,3)');
 [mf1_13,~] = maxflow(G,1,13);
 
 %% 5.c
@@ -77,3 +78,4 @@ cvx_begin
 cvx_end
 fo2 = f;
 
+%% 5.g
