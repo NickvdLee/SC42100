@@ -71,11 +71,33 @@ w = fstar.*dacc;
 
 cvx_begin
     variable f(M)
-    minimize sum(-l.*c.*log(c-f)/log(exp(1))+w.*f)
+    minimize sum(-l.*c.*log(c-f)+w.*f)
     subject to
         B*f == lambda - mu
         0 <= f <= c
 cvx_end
-fo2 = f;
+fw = f;
 
 %% 5.g
+% compute the new fstar using the new cost function:
+cvx_begin
+    variable f(M)
+    minimize sum((l.*c).*inv_pos(One-f.*(1.*inv_pos(c)))-f.*l)
+    subject to
+        B*f == lambda - mu
+        0 <= f <= c
+cvx_end
+fstar2 = f;
+
+% compute the wardrup equilibrium using the tolls:
+dacc = c.*l./((c-fstar2).*(c-fstar2));
+w2 = fstar2.*dacc - l; % -l due to the altered cost function, so c'is different. 
+
+cvx_begin
+    variable f(M)
+    minimize sum(-l.*c.*log(c-f)+w2.*f)
+    subject to
+        B*f == lambda - mu
+        0 <= f <= c
+cvx_end
+fw2 = f;
