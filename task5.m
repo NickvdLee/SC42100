@@ -1,3 +1,12 @@
+%{
+task 5.
+
+Written by:
+Pim de Bruin        4545702
+Nick van der Lee    4144600
+%}
+
+
 close all; clear all; clc;
 addpath('functions/');
 % addpath('cvx/');
@@ -34,7 +43,7 @@ G = digraph(Links(:,1)',Links(:,2), Links(:,3)');
 [mf1_13,~] = maxflow(G,1,13);
 
 %% 5.c
-nu = traffic*flow;
+nu = traffic*flow; % nu = B*f
 
 %% 5.d
 % Define important parameters. 
@@ -57,12 +66,13 @@ cvx_begin quiet
 cvx_end
 fstar = f; % The social optimum
 
+% Plot the flow over the graph
+figure()
 Gplot = digraph(Links(:,1)', Links(:,2)', fstar');
 W = Gplot.Edges.Weight./max(Gplot.Edges.Weight);
-h = plot(Gplot,'k','EdgeLabel',round(Gplot.Edges.Weight),'LineWidth',3*W,'ArrowSize',15*W,'Layout','force');
+plot(Gplot,'k','EdgeLabel',round(Gplot.Edges.Weight),'LineWidth',3*W,'ArrowSize',15*W,'Layout','force');
 
 %% 5.e
-
 % Compute wardrup optimum using the appropriate cost function
 cvx_begin quiet
     variable f(M)
@@ -73,16 +83,17 @@ cvx_begin quiet
 cvx_end
 fw = f;
 
+% Plot the flow over the graph. 
+figure()
 Gplot = digraph(Links(:,1)', Links(:,2)', fw');
 W = Gplot.Edges.Weight./max(Gplot.Edges.Weight);
-h = plot(Gplot,'k','EdgeLabel',round(Gplot.Edges.Weight),'LineWidth',3*W,'ArrowSize',15*W,'Layout','force');
+plot(Gplot,'k','EdgeLabel',round(Gplot.Edges.Weight),'LineWidth',3*W,'ArrowSize',15*W,'Layout','force');
 fo = f; % Wardrup optimum
 
 
 %% 5.f
 % Compute toll vector w
 dacc = c.*l./((c-fstar).*(c-fstar));
-% dacc = l.*fstar./c./((fstar./c-1).^2);
 w = fstar.*dacc;
 
 cvx_begin quiet
@@ -94,6 +105,7 @@ cvx_begin quiet
 cvx_end
 fw = f; % wardrup optimal vector using tolls
 
+
 %% 5.g
 % compute the new fstar using the new cost function:
 cvx_begin
@@ -104,6 +116,7 @@ cvx_begin
         0 <= f <= c
 cvx_end
 fstar2 = f; % new fstar using new cost function
+
 
 % compute the wardrup equilibrium using the tolls:
 dacc = c.*l./((c-fstar2).*(c-fstar2));
@@ -117,3 +130,10 @@ cvx_begin
         0 <= f <= c
 cvx_end
 fw2 = f; % new wardrup optimum using new cost function and new tolls. 
+
+
+% Plot added travel times
+figure()
+Gplot = digraph(Links(:,1)', Links(:,2)', (l./(1-fstar2./c) - traveltime)');
+W = Gplot.Edges.Weight./max(Gplot.Edges.Weight);
+h = plot(Gplot,'k','EdgeLabel',round(Gplot.Edges.Weight,2),'ArrowSize',0,'LineWidth',3*W,'Layout','force');

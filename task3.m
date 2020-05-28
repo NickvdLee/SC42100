@@ -1,3 +1,11 @@
+%{
+task 3.
+
+Written by:
+Pim de Bruin        4545702
+Nick van der Lee    4144600
+%}
+
 close all; clear all; clc;
 addpath('functions/');
 load -ascii twitter.mat
@@ -5,7 +13,7 @@ W = spconvert(twitter); clear twitter;
 
 %% Construct graph
 l = length(W);
-W(l,l) = 0; % Resize by adding proper rows
+W(l,l) = 0; % Resize by adding proper collums
 
 G = digraph(W);
 P = diag(1./sum(W,2))*W; % Fast inverse
@@ -13,20 +21,19 @@ P = diag(1./sum(W,2))*W; % Fast inverse
 mu = ones(l,1);
 beta = 0.15; % Typical value
 
-PageRank = mu; % Typical initialization?
-M = (1-beta)*P'; % Cache these
+
+% set up pagerank iteratively
+PageRank = mu; 
+M = (1-beta)*P';
 N = beta*mu;
-for i=1:100
+for i=1:75
     PageRank = M*PageRank + N;
 end
-% Pagerank = (eye(l)-M)\N; SS solution
 
-[PR, idxs] = maxk(PageRank,5);
+[PR, idxs] = maxk(PageRank,5); % find maximum 5 page ranks. 
 
 %% Stubborn nodes
 % Let's find out if there already are stubborn nodes (sinks)
-sources = [];
-sinks = [];
 in = find(indegree(G) == 0);
 out = find(outdegree(G) == 0);
 
@@ -37,10 +44,13 @@ S = [1 c];
 s = 2;
 R = [2:c-1 c+1:l];
 r = l-s;
+
 % Remove outgoing edges
 for edge=outedges(G,c)
     G = rmedge(G,edge);
 end
+
+% re compute graph
 W = adjacency(G);
 P = diag(1./sum(W,2))*W; % Fast inverse
 Q = P(R,R);
@@ -49,12 +59,11 @@ B = P(R,S);
 u = [1;0]; 
 
 % Dynamics
-% Shortest path?
 D = distances(G);
 D(isinf(D)) = -1;
 D = max(max(D));
-% yields 31, so T ~ D*5 or so?
 
+% Simulate system
 T = 150;
 y = zeros(r,T);
 y(:,1) = rand(r,1);
@@ -73,6 +82,7 @@ for k=1:num_plots
         yidxnames{k} = sprintf('%d',yidxs(k)+2);
     end
 end
+
 figure(1)
 hold off
 for i=yidxs
@@ -120,7 +130,8 @@ for S=C
     Y = [Y y];
 end
 
-% Plots
+
+% Plot bpxplot
 figure(2)
 boxplot(Y,'Colors','k')
 

@@ -1,3 +1,11 @@
+%{
+task 1.
+
+Written by:
+Pim de Bruin        4545702
+Nick van der Lee    4144600
+%}
+
 close all; clear all; clc;
 addpath('functions/');
 
