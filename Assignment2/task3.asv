@@ -19,12 +19,12 @@ x0 = {x01, x02, x03, x04};
 
 %% MPC
 alpha = 0.5;      % step size
-iterations = 20;
+iterations = 150;
 
 
 % save xf over all iterations and initialise. 
 xfs = cell(1,iterations);
-xfs(1,:) = {zeros(4,1)};
+xfs(:,1) = {zeros(4,1)};
 
 % Set up lambda
 lambda = cell(4,iterations);
@@ -56,7 +56,6 @@ for i = 1:iterations
         cost{j} = (T*x0{j}+S*u)'*(T*x0{j}+S*u) + u'*u;
         inputs{j} = u;
         lambda{j,i} = Lambda;
-        disp(['i: ',num2str(i),' j: ',num2str(j)])
     end
     xfs{1,i+1} = xfs{1,i} - alpha*(lambda{1,i}' - lambda{2,i}');      % update xf based on subgradient. 
 end
