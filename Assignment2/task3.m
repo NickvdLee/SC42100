@@ -18,8 +18,8 @@ x0 = {x01, x02, x03, x04};
 % Systems are not stable
 
 %% MPC
-alpha = 0.00025;      % step size
-iterations = 100;
+alpha = 0.5;      % step size
+iterations = 500;
 
 % save xf over all iterations and initialise. 
 xfs = cell(4,iterations);
@@ -27,36 +27,46 @@ xfs(:,:) = {zeros(4,1)};
 
 %%
 % Set up lambda
-lambda = cell(4,4,iterations);
+lambda = cell(n,n,iterations);
 lambda(:,:,:) = {ones(4,1)};
 for k=1:n
     lambda(k,k,:) = {zeros(4,1)};
 end
 
 % save inputs and cost for all nodes
-inputs = cell(4,1);
-cost = cell(4,1);
+inputs = cell(n,1);
+cost = cell(n,1);
 %%
 % Solve the problem in one time step:
+T = cell(1,n);
+S = cell(1,n);
+W = cell(1,n);
+for i = 1:n
+    [t,s,w] = mpc_mtrx(A{i},B{i},Tfinal);
+    T{i} = t;
+    S{i} = s;
+    W{i} = w;
+end
 for k = 1:iterations
-    for i = 1:4
+    for i = 1:n
         % Making S and T. X_N+1 = Tx_0 + Su_n
-        [T,S,W] = mpc_mtrx(A{i},B{i},Tfinal);
+%         [T,S,W] = mpc_mtrx(A{i},B{i},Tfinal);
         % x = Tx0 + Su
         % xN = A^N x0 + Wu
         
         % Optimising over the control input. 
         cvx_begin quiet
             variable u(2*Tfinal,1)
-            x = T*x0{i} + S*u;
-            xf = A{i}^Tfinal*x0{i}+W*u;
+            x = T{i}*x0{i} + S{i}*u;
+            xf = A{i}^Tfinal*x0{i}+W{i}*u;
             lij = 0;            
             lji = 0;
             for j=1:n
                 lij = lij + lambda{i,j,k};
                 lji = lji + lambda{j,i,k};
             end
-            minimize(x'*x + u'*u + lij'*xf - lji'*xf)
+            theta = repmat(xf,[Tfinal,1]);
+            minimize((x-theta)'*(x-theta) + u'*u + lij'*xf - lji'*xf)
             subject to
                 u'*u <= umax^2;
         cvx_end
@@ -79,5 +89,6 @@ for k = 1:iterations
 
     disp('Final states:');
     disp([xfs{1,k} xfs{2,k} xfs{3,k} xfs{4,k}]);
+    disp(norm(diff([xfs{1,k} xfs{2,k} xfs{3,k} xfs{4,k}],n-1,2)));
 end
 
