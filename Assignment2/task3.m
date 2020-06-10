@@ -27,7 +27,7 @@ xfs = cell(4,iterations);
 %xfs(4,:) = {zeros(4,1)};
 
 % Set up lambda
-nu = cell(3,iterations);
+nu = cell(1,iterations);
 nu(:,:) = {ones(4,1)};
 
 % save inputs and cost for all nodes
@@ -40,7 +40,7 @@ hold on
 
 % Solve the problem in one time step:
 for i = 1:iterations
-    for j = 1:4
+    for j = 1:2
         % Making S and T. X_N+1 = Tx_0 + Su_n
         [T,S,W] = mpc_mtrx(A{j},B{j},Tfinal);
         % x = Tx0 + Su
@@ -53,11 +53,7 @@ for i = 1:iterations
             if j == 1
                 minimize((T*x0{j}+S*u)'*(T*x0{j}+S*u) + u'*u + nu{1,i}'*xf)
             elseif j == 2
-                minimize((T*x0{j}+S*u)'*(T*x0{j}+S*u) + u'*u +(nu{2,i}' - nu{1,i}')*xf)
-            elseif j == 3
-                minimize((T*x0{j}+S*u)'*(T*x0{j}+S*u) + u'*u +(nu{3,i}' - nu{2,i}')*xf)
-            elseif j == 4
-                minimize((T*x0{j}+S*u)'*(T*x0{j}+S*u) + u'*u - nu{3,i}'*xf)
+                minimize((T*x0{j}+S*u)'*(T*x0{j}+S*u) + u'*u - nu{1,i}'*xf)
             end
             subject to
                 A{j}^Tfinal*x0{j}+W*u == xf;
@@ -72,17 +68,14 @@ for i = 1:iterations
         inputs{j} = u;
         disp(['i: ',num2str(i),' j: ',num2str(j)])
     end
+    
     nu{1,i+1} = nu{1,i} + alpha*(xfs{1,i} - xfs{2,i});
-    nu{2,i+1} = nu{2,i} + alpha*(xfs{2,i} - xfs{3,i});
-    nu{3,i+1} = nu{3,i} + alpha*(xfs{3,i} - xfs{4,i});
-    
-    plane1 = plot(i,sum(xfs{1,i}),'ro');
-    plane2 = plot(i,sum(xfs{2,i}),'bo');
-    plane3 = plot(i,sum(xfs{3,i}),'ko');
-    plane4 = plot(i,sum(xfs{4,i}),'go');
-    %err = plot(i,abs(sum(xfs{1,i}) - sum(xfs{2,i})),'go');
+       
+    plane1 = plot(i,xfs{1,i}(2),'ro');
+    plane2 = plot(i,xfs{2,i}(2),'bo');
+    % plane3 = plot(i,xfs{3,i}(2),'ko');
+    % plane4 = plot(i,xfs{4,i}(2),'go');
+    % err = plot(i,abs(sum(xfs{1,i}) - sum(xfs{2,i})),'go');
     drawnow;
-    
-    disp(norm(diff([xfs{1,i} xfs{2,i} xfs{3,i} xfs{4,i}],3,2)));
 end
 
