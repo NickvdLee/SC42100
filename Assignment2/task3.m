@@ -19,17 +19,17 @@ x0 = {x01, x02, x03, x04};
 
 %% MPC
 alpha = .15;      % step size
-iterations = 100;
+iter = 100;
 
 % save xf over all iterations and initialise. 
-xfs = cell(4,iterations);
+xfs = cell(4,iter);
 xfs(:,:) = {zeros(4,1)};
-xs = cell(4,iterations);
+xs = cell(4,iter);
 xs(:,:) = {zeros((Tfinal+1)*size(A1,1),1)};
 
 %%
 % Set up lambda
-lambda = cell(n,n,iterations);
+lambda = cell(n,n,iter);
 lambda(:,:,:) = {ones(4,1)};
 for r=1:n
     lambda(r,r,:) = {zeros(4,1)};
@@ -46,7 +46,7 @@ for i = 1:n
     T{i} = sparse(t); S{i} = sparse(s); W{i} = w;
 end
 
-for r = 1:iterations
+for r = 1:iter
     for i = 1:n
         % Making S and T. X_N+1 = Tx_0 + Su_n
 %         [T,S,W] = mpc_mtrx(A{i},B{i},Tfinal);
@@ -96,11 +96,12 @@ end
 %% Plots
 figure(1)
 colors = {[0 0 1],[1 0 0],[0 1 0],[0 1 1]};
-for r = 1:100
+for r = 1:iter
     for i=1:4
         X = reshape(xs{i,r},[4 6]);
-        plot(X(1,:),X(2,:),'-','Color',(colors{i}*r + [.75 .75 .75].*(100-r))/100);
+        plot(X(1,:),X(2,:),'-','Color',(colors{i}*r + [.75 .75 .75].*(iter-r))/iter);
         hold on
+        axis(([X(1,6)-1 X(1,6)+1 X(2,6)-1 X(2,6)+1]*r + [-10 10 -10 10]*(iter-r))/iter);
     end
     hold off
     drawnow
