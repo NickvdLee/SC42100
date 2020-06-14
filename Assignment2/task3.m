@@ -99,8 +99,11 @@ colors = {[0 0 1],[1 0 0],[0 1 0],[0 1 1]};
 for r = 1:100
     for i=1:4
         X = reshape(xs{i,r},[4 6]);
-        plot(X(1,:),X(2,:),'.','Color',colors{i}*r/100);
+        plot(X(1,:),X(2,:),'-','Color',(colors{i}*r + [.75 .75 .75].*(100-r))/100);
         hold on
     end
-%     hold off
+    hold off
+    drawnow
+    pause(0.5);
+    
 end
