@@ -1,4 +1,5 @@
 clc; clear all; close all;
+set(0,'defaultTextInterpreter','latex');
 %{ 
 Written by:
     Pim de Bruin
@@ -36,7 +37,7 @@ for r=1:n
 end
 
 % save inputs and cost for all nodes
-inputs = cell(n,1);
+inputs = cell(n,iter);
 cost = cell(n,1);
 
 % Solve the problem in one time step:
@@ -68,9 +69,10 @@ for r = 1:iter
             minimize(x'*x + xf'*xf + u'*u + lij'*xf - lji'*xf)
             subject to
                 u'*u <= umax^2;
+                xf >= zeros(4,1);
         cvx_end
         
-        inputs{i} = u;
+        inputs{i,r} = u;
         xfs{i,r} = xf;
         xs{i,r} = [T{i}*x0{i}+S{i}*u;xf];
         disp(['i: ',num2str(r),' j: ',num2str(i)])
@@ -94,6 +96,8 @@ for r = 1:iter
 end
 
 %% Plots
+
+% Xs
 figure(1)
 colors = {[0 0 1],[1 0 0],[0 1 0],[0 1 1]};
 for r = 1:iter
@@ -105,6 +109,94 @@ for r = 1:iter
     end
     hold off
     drawnow
-    pause(0.5);
-    
+    pause(0.1);  
 end
+
+
+% Xfs
+Xf = zeros(4,iter,4);
+p0 = gobjects(4);
+shapes = {'-','--',':','-.'};
+markers = {'o','x','^','s'};
+
+for r = 1:iter
+    for j = 1:n     % 4 planes
+        for i =1:4  % 4 states
+            Xf(j,r,i) = xfs{j,r}(i);
+        end
+    end
+end
+
+figure(2)
+hold on;
+for i = 1:4         % 4 states
+    for j = 1:n     % 4 planes
+        p0(i,j) = plot(1:iter,Xf(j,:,i),shapes{j},'Color',colors{i});
+    end
+end
+xlabel('Iterations')
+ylabel('State value')
+ylim([0 4]);
+title("Private $$x_f$$ for all 4 planes over all iterations")
+
+p1 = plot(1:iter,Xf(1,:,1),shapes{1},'Color',colors{1}); % plot first one again for the legend. (otherwise it has 2 legend entries)
+lgd = legend([p1 p0(1,2:end),p0(:,1)'],'Plane 1','Plane 2','Plane 3','Plane 4','x','y','xdot','ydot');
+lgd.NumColumns = 2;
+
+
+% inputs
+U = zeros(n,iter);
+for r = 1:iter
+    for j = 1:n     % 4 planes
+        U(j,r) = inputs{j,r}'*inputs{j,r};
+    end
+end
+
+figure(3);
+hold on;
+p2 = zeros(4,1);
+for j = 1:n
+    p2(j) =  plot(1:iter,U(j,:),shapes{j},'Color','k');   
+end
+legend('Plane 1','Plane 2','Plane 3','Plane 4','Location','northeast');
+title('$$u^Tu$$ per plane per time step');
+xlabel('Iterations')
+ylabel('$$u^Tu$$')
+
+
+% states
+X = zeros(4,Tfinal+1,n); % states X time steps X planes
+U = zeros(2,Tfinal,n);   % inputs X time steps X planes 
+p4 = gobjects(4,1);
+p5 = gobjects(4,1);
+
+
+figure(4);
+sgtitle('States of all 4 planes');
+subplot(3,2,[1,2,3,4])
+    hold on;
+    for j = 1:n     % 4 planes
+        X(:,:,j) = reshape(xs{j,iter},[4,6]);
+        plot(X(1,1:end-1,j),X(2,1:end-1,j),strcat(shapes{j},markers{j}),'Color','k');
+        hold on;
+    end
+    xlabel('x position')
+    ylabel('y position')
+    legend('Plane 1','Plane 2','Plane 3','Plane 4','Location','east');
+subplot(3,2,[5,6])
+    hold on;
+    for j = 1:n     % 4 planes
+        p4(j) = plot(1:Tfinal,X(3,1:end-1,j),shapes{j},'Color',colors{3});
+        p5(j) = plot(1:Tfinal,X(4,1:end-1,j),shapes{j},'Color',colors{4});
+    end
+    lgd = legend([p4(1) p5(1)],'xdot','ydot');
+    xlabel('Time steps')
+    ylabel('velocity')
+
+
+
+
+
+
+
+
