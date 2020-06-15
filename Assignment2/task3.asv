@@ -172,8 +172,6 @@ p5 = gobjects(4,1);
 
 
 figure(4);
-sgtitle('States of all 4 planes');
-subplot(3,2,[1,2,3,4])
     hold on;
     for j = 1:n     % 4 planes
         X(:,:,j) = reshape(xs{j,iter},[4,6]);
@@ -183,7 +181,9 @@ subplot(3,2,[1,2,3,4])
     xlabel('x position')
     ylabel('y position')
     legend('Plane 1','Plane 2','Plane 3','Plane 4','Location','east');
-subplot(3,2,[5,6])
+    
+    
+figure(5);
     hold on;
     for j = 1:n     % 4 planes
         p4(j) = plot(1:Tfinal,X(3,1:end-1,j),shapes{j},'Color',colors{3});
@@ -192,6 +192,7 @@ subplot(3,2,[5,6])
     lgd = legend([p4(1) p5(1)],'xdot','ydot');
     xlabel('Time steps')
     ylabel('velocity')
+    title('Velocities over time')
 
 
 
