@@ -69,7 +69,6 @@ for r = 1:iter
             minimize(x'*x + xf'*xf + u'*u + lij'*xf - lji'*xf)
             subject to
                 u'*u <= umax^2;
-                xf >= zeros(4,1);
         cvx_end
         
         inputs{i,r} = u;
@@ -136,7 +135,7 @@ for i = 1:4         % 4 states
 end
 xlabel('Iterations')
 ylabel('State value')
-ylim([0 4]);
+ylim([-4 4]);
 title("Private $$x_f$$ for all 4 planes over all iterations")
 
 p1 = plot(1:iter,Xf(1,:,1),shapes{1},'Color',colors{1}); % plot first one again for the legend. (otherwise it has 2 legend entries)
